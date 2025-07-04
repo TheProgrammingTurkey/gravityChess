@@ -25,8 +25,6 @@ class EndType(Enum):
     CHECKMATE = "Checkmate"
     STALEMATE = "Stalemate"
     INSUFFICIENT = "Insufficient Material"
-    MOVERULE = "50 Move Rule" #More than 50 moves without pawn movement or capture
-    REPETITION = "Repetition" #Same state 3 times
 
 #set up a class for pieces
 class Piece:
@@ -122,12 +120,22 @@ def locatePressedSquare(mousePos):
 #determines whether the game is over
 def checkEnding():
     global board, platforms, isWhiteTurn
-    #Check if game is over
     hasMove = False
+    pawnHasMove = False
     for row in range(len(board)):
         for col in range(len(board[row])):
+            #if no piece can move --> stalemate or checkmate
             if not hasMove and getSquareState(board, row, col) == (SquareState.LIGHT if isWhiteTurn else SquareState.DARK) and len(getValidMoves(board, row, col, isWhiteTurn, True)) > 0:
                 hasMove = True
+            #if a pawn can move --> still life in the position
+            if not pawnHasMove and getPiece(board, row, col) == Piece(True, PieceType.PAWN) and (len(getValidMoves(board, row, col, True, True)) > 0 or col == 7):
+                pawnHasMove = True
+            elif not pawnHasMove and getPiece(board, row, col) == Piece(False, PieceType.PAWN) and (len(getValidMoves(board, row, col, False, True)) > 0 or col == 0):
+                pawnHasMove = True
+            #if a pawn is not on the bottom --> still life in the position
+            elif not pawnHasMove and row < 7 and (getPiece(board, row, col) == Piece(False, PieceType.PAWN) or getPiece(board, row, col) == Piece(True, PieceType.PAWN)):
+                pawnHasMove = True
+    #Checkmate vs Stalemate
     if not hasMove:
         if not isCheck(board, True) and not isCheck(board, False):
             return EndType.STALEMATE
@@ -135,6 +143,20 @@ def checkEnding():
             return EndType.CHECKMATE       
         else:
             return EndType.CHECKMATE
+    #If any rook, queen, bishop, or more than 2 knights are on a team, checkmate is possible
+    if amtOfType(PieceType.ROOK) > 0 or amtOfType(PieceType.QUEEN) > 0 or amtOfType(PieceType.BISHOP) > 0 or amtOfPiece(Piece(True, PieceType.KNIGHT)) > 2 or amtOfPiece(Piece(False, PieceType.KNIGHT)) > 2:
+        return EndType.PLAYING
+    #If a pawn can move then play on
+    if pawnHasMove:
+        return EndType.PLAYING
+    #If no queens, rooks, bishops
+    if amtOfType(PieceType.ROOK) == 0 and amtOfType(PieceType.QUEEN) == 0 and amtOfType(PieceType.BISHOP) == 0:
+        #if no knights and pawns cant move --> insufficient material
+        if amtOfType(PieceType.KNIGHT) == 0 and not pawnHasMove:
+            return EndType.INSUFFICIENT
+        #if no pawns and not enough knights --> Insufficient material
+        if amtOfPiece(Piece(True, PieceType.PAWN)) == 0 and amtOfPiece(Piece(True, PieceType.KNIGHT)) <= 2 and amtOfPiece(Piece(False, PieceType.PAWN)) == 0 and amtOfPiece(Piece(False, PieceType.KNIGHT)) <= 2:
+            return EndType.INSUFFICIENT
     return EndType.PLAYING
     
 #checks to see if removing the platform would result in its own king in check
@@ -148,6 +170,20 @@ def checkPlatform(board, platforms, oldRow, oldCol, newRow, newCol):
     if isCheck(gravity(tempBoard, tempPlatforms, False), isWhiteTurn):
         return False
     return True
+
+#finds amt of pieces of a type
+def amtOfType(type):
+    total = 0
+    for row in board:
+        total += row.count(Piece(True, type))+row.count(Piece(False, type))
+    return total
+
+#finds amt of pieces of a piece
+def amtOfPiece(piece):
+    total = 0
+    for row in board:
+        total += row.count(piece)
+    return total
 
 #updates the board once a move has been made
 def makeMove(board, isWhiteTurn, pieceFrom, pieceTo):
@@ -419,6 +455,7 @@ def getIndexOf(array2d, item):
         for arrayItem in array1d:
             if item == arrayItem:
                 return [array2d.index(array1d), array1d.index(arrayItem)]
+    return [-1, -1]
 
 #finds whether the current players king is in check         
 def isCheck(board, isWhiteTurn):
@@ -513,6 +550,8 @@ def draw(board):
             text = font.render("Checkmate - Black Wins", True, "black")
         elif gameOver == EndType.CHECKMATE:
             text = font.render("Checkmate - White Wins", True, "black")
+        elif gameOver == EndType.INSUFFICIENT:
+            text = font.render("Draw - Insufficient Material", True, "black")
         screen.blit(text, (500, 20))
     #flip() the display to put your work on screen
     pygame.display.flip()
@@ -590,6 +629,7 @@ while running:
             #find mouse position when hovering
             if event.type == pygame.MOUSEMOTION:
                 hoveredPos = locatePressedSquare(event.pos)
+                print(amtPlatforms)
                 if platformHovering and amtPlatforms >= maxPlatforms and pressedPlatform == [-1, -1] and platforms[hoveredPos[0]][hoveredPos[1]] < 1:
                     hoveredPos = [-1, -1]
                 elif platformHovering and (whiteJustPlatformed if isWhiteTurn else blackJustPlatformed):
@@ -637,7 +677,7 @@ while running:
                             board = gravity(board, platforms, True)
                             validMoves = []
                             platforms = setPlatforms(platforms)
-                    elif platforms[pressedPlatform[0]][pressedPlatform[1]] == 0 and amtPlatforms < maxPlatforms: 
+                    elif platforms[pressedPlatform[0]][pressedPlatform[1]] == 0 and amtPlatforms < maxPlatforms and not isCheck(board, isWhiteTurn): 
                         #add a platform
                         if hoveredPos == pressedPlatform:
                             amtPlatforms+=1
