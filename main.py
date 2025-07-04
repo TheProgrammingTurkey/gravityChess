@@ -629,7 +629,6 @@ while running:
             #find mouse position when hovering
             if event.type == pygame.MOUSEMOTION:
                 hoveredPos = locatePressedSquare(event.pos)
-                print(amtPlatforms)
                 if platformHovering and amtPlatforms >= maxPlatforms and pressedPlatform == [-1, -1] and platforms[hoveredPos[0]][hoveredPos[1]] < 1:
                     hoveredPos = [-1, -1]
                 elif platformHovering and (whiteJustPlatformed if isWhiteTurn else blackJustPlatformed):
