@@ -553,6 +553,96 @@ def draw(board):
         elif gameOver == EndType.INSUFFICIENT:
             text = font.render("Draw - Insufficient Material", True, "black")
         screen.blit(text, (500, 20))
+    
+    #Instructions
+    font = pygame.font.SysFont(None, 50)
+    text = font.render("Gravity Chess", True, "black")
+    screen.blit(text, (120, 40))
+
+    font = pygame.font.SysFont(None, 25)
+    text = font.render("Chess with gravity after every move and platforms", True, "black")
+    screen.blit(text, (30, 110))
+
+    font = pygame.font.SysFont(None, 25)
+    text = font.render("Pieces: The chess pieces work like normal chess,", True, "black")
+    screen.blit(text, (30, 150))
+
+    font = pygame.font.SysFont(None, 25)
+    text = font.render("except at the end of each move they fall down to the", True, "black")
+    screen.blit(text, (10, 170))
+
+    font = pygame.font.SysFont(None, 25)
+    text = font.render("bottom of the board (gravity). Checks are processed", True, "black")
+    screen.blit(text, (10, 190))
+
+    font = pygame.font.SysFont(None, 25)
+    text = font.render("after gravity is applied. To move a piece, click on", True, "black")
+    screen.blit(text, (10, 210))
+
+    font = pygame.font.SysFont(None, 25)
+    text = font.render("the piece and click on the square you want it to move", True, "black")
+    screen.blit(text, (10, 230))
+
+    font = pygame.font.SysFont(None, 25)
+    text = font.render("to. Yellow highlights mean that piece is selected.", True, "black")
+    screen.blit(text, (10, 250))
+
+    font = pygame.font.SysFont(None, 25)
+    text = font.render("Blue highlights mean possible moves. Red highlights", True, "black")
+    screen.blit(text, (10, 270))
+
+    font = pygame.font.SysFont(None, 25)
+    text = font.render("mean the king is in check.", True, "black")
+    screen.blit(text, (10, 290))
+
+    font = pygame.font.SysFont(None, 25)
+    text = font.render("Platforms: Platforms can counter the effects of", True, "black")
+    screen.blit(text, (30, 340))
+
+    font = pygame.font.SysFont(None, 25)
+    text = font.render("gravity. To place a platform, click a horizontal line on", True, "black")
+    screen.blit(text, (10, 360))
+
+    font = pygame.font.SysFont(None, 25)
+    text = font.render("the board, and click again to confirm. To move a", True, "black")
+    screen.blit(text, (10, 380))
+
+    font = pygame.font.SysFont(None, 25)
+    text = font.render("platform, click a platform and click a different", True, "black")
+    screen.blit(text, (10, 400))
+
+    font = pygame.font.SysFont(None, 25)
+    text = font.render("horizontal line. To Remove a platform, click a platform", True, "black")
+    screen.blit(text, (10, 420))
+
+    font = pygame.font.SysFont(None, 25)
+    text = font.render("and click it again to confirms its removal. Finally, to", True, "black")
+    screen.blit(text, (10, 440))
+
+    font = pygame.font.SysFont(None, 25)
+    text = font.render("unselect a platform, click anywhere else on the board", True, "black")
+    screen.blit(text, (10, 460))
+
+    font = pygame.font.SysFont(None, 25)
+    text = font.render("that is not a current platform.", True, "black")
+    screen.blit(text, (10, 480))
+
+    # font = pygame.font.SysFont(None, 25)
+    # text = font.render("", True, "black")
+    # screen.blit(text, (10, 410))
+
+    # font = pygame.font.SysFont(None, 25)
+    # text = font.render("", True, "black")
+    # screen.blit(text, (10, 430))
+
+    # font = pygame.font.SysFont(None, 25)
+    # text = font.render("", True, "black")
+    # screen.blit(text, (10, 450))
+
+
+
+
+
     #flip() the display to put your work on screen
     pygame.display.flip()
 
